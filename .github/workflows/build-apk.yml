@@ -15,8 +15,8 @@ jobs:
           curl -fsSL https://github.com/MiKTeX/miktex/archive/${latest_rel}.tar.gz | \
             tar -xz --strip-components=1 -C miktex/source
           docker run -t \
-            -v miktex/source:/miktex/source:ro \
-            -v miktex/builds/alpine-latest:/miktex/build:rw \
+            -v ${GITHUB_WORKSPACE}/miktex/source:/miktex/source:ro \
+            -v ${GITHUB_WORKSPACE}/miktex/builds/alpine-latest:/miktex/build:rw \
             -e USER_ID=`id -u` \
             -e GROUP_ID=`id -g` \
             maboloshi/miktex-build-alpine:latest
