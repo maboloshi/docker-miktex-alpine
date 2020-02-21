@@ -1,0 +1,27 @@
+name: Build and Upload the MiKTeX apk package
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: "contains(github.event.head_commit.message, '[build apk]')"
+    steps:
+      - name: Build the MiKTeX apk package
+        run: |
+          mkdir -p miktex/source
+          mkdir -p miktex/builds/alpine-latest
+          latest_rel=$(curl -s "https://github.com/MiKTeX/miktex/releases/latest" | \
+            sed 's#.*tag/\(.*\)\".*#\1#')
+          curl -fsSL https://github.com/MiKTeX/miktex/archive/${latest_rel}.tar.gz | \
+            tar -xz --strip-components=1 -C miktex/source
+          docker run -t \
+            -v miktex/source:/miktex/source:ro \
+            -v miktex/builds/alpine-latest:/miktex/build:rw \
+            -e USER_ID=`id -u` \
+            -e GROUP_ID=`id -g` \
+            maboloshi/miktex-build-alpine:latest
+      - name: Upload artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: miktex.apk
+          path: miktex/builds/alpine-latest/miktex-*.apk
