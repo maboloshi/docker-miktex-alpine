@@ -7,7 +7,21 @@ jobs:
     if: "contains(github.event.head_commit.message, '[docker-build]')"
     steps:
     - uses: actions/checkout@master
-    - name: Publish to Docker Repository
+    - name: Build the MiKTeX apk package
+      run: |
+        mkdir -p miktex/source
+        mkdir -p miktex/builds/alpine-latest
+        latest_rel=$(curl -s "https://github.com/MiKTeX/miktex/releases/latest" | \
+          sed 's#.*tag/\(.*\)\".*#\1#')
+        curl -fsSL https://github.com/MiKTeX/miktex/archive/${latest_rel}.tar.gz | \
+          tar -xz --strip-components=1 -C miktex/source
+        docker run -t \
+          -v ${GITHUB_WORKSPACE}/miktex/source:/miktex/source:ro \
+          -v ${GITHUB_WORKSPACE}/miktex/builds/alpine-latest:/miktex/build:rw \
+          -e USER_ID=`id -u` \
+          -e GROUP_ID=`id -g` \
+          maboloshi/miktex-build-alpine:latest
+    - name: Build and Publish to Docker Repository
       uses: elgohr/Publish-Docker-Github-Action@master
       with:
         name: maboloshi/miktex-alpine

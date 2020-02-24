@@ -1,0 +1,30 @@
+name: Build and Publish Docker
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: "contains(github.event.head_commit.message, '[build-docker-miktex]')"
+    steps:
+    - uses: actions/checkout@master
+    - name: Build the MiKTeX apk package
+      run: |
+#        pkgver=$(curl -s "https://github.com/MiKTeX/miktex/releases/latest" | \
+#        sed 's#.*tag/\(.*\)\".*#\1#')
+        cd build-miktex
+        mkdir -p apk
+        docker run \
+            -e RSA_PRIVATE_KEY="$(cat miktex-builder.rsa)" \
+            -e RSA_PRIVATE_KEY_NAME="miktex-builder.rsa" \
+            -v "$PWD:/home/builder/package" \
+            -v "$PWD/apk:/packages" \
+            -v "$PWD/miktex-builder.rsa.pub:/etc/apk/keys/miktex-builder.rsa.pub" \
+            andyshinn/alpine-abuild:latest
+#        mv apk/miktex* miktex.apk
+        cd ../
+    - name: Build and Publish to Docker Repository
+      uses: elgohr/Publish-Docker-Github-Action@master
+      with:
+        name: maboloshi/miktex-alpine
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}

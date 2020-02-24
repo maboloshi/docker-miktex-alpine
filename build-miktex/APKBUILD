@@ -1,0 +1,73 @@
+pkgname=miktex
+pkgver=2.9.7300
+pkgrel=1
+pkgdesc="a distribution of the TeX/LaTeX typesetting system"
+arch="x86_64"
+url="https://miktex.org"
+license="custom"
+depends="apr apr-util bzip2 cairo expat fontconfig freetype
+         fribidi gd gmp graphite2 hunspell icu
+         libjpeg xz mpfr4 libmspack openssl pixman libpng
+         popt potrace uriparser"
+depends_dev=""
+#?makedepends=('git' 'cmake' 'coreutils' 'fop' 'sed' 'libxslt' 'qt5-tools')
+makedepends="apr-dev apr-util-dev bison ca-certificates cmake 
+             curl dpkg-dev file flex g++ gcc jpeg-dev 
+             bzip2-dev cairo-dev curl-dev fribidi-dev 
+             gd-dev gmp-dev graphite2-dev hunspell-dev icu-dev 
+             mpfr-dev libmspack-dev popt-dev potrace-dev openssl-dev 
+             uriparser-dev zziplib-dev make libxslt xz-dev"
+#'su-exec' 
+source="https://miktex.org/download/ctan/systems/win32/miktex/source/${pkgname}-${pkgver}.tar.xz"
+
+builddir="$srcdir/$pkgname-$pkgver/build"
+sourcedir=""
+
+pkgver() {
+    printf "%s" "$(curl -s "https://github.com/MiKTeX/miktex/releases/latest" | \
+        sed 's#.*tag/\(.*\)\".*#\1#')"
+}
+
+prepare() {
+#configure.sh
+#    package_revision=${1-1}
+    cd $builddir
+    cmake \
+#        -DMIKTEX_PACKAGE_REVISION=${package_revision} \
+#        -DMIKTEX_LINUX_DIST=alpine \
+#        -DMIKTEX_LINUX_DIST_VERSION=undefined \
+#        -DMIKTEX_LINUX_DIST_CODE_NAME=undefined \
+        -DUSE_SYSTEM_HARFBUZZ=FALSE \
+        -DUSE_SYSTEM_HARFBUZZ_ICU=FALSE \
+        -DUSE_SYSTEM_LOG4CXX=FALSE \
+        -DUSE_SYSTEM_POPPLER=FALSE \
+        -DUSE_SYSTEM_POPPLER_QT5=FALSE \
+        -DUSE_SYSTEM_ZZIP=FALSE \
+        -DWITH_UI_QT=FALSE \
+        /miktex/source
+}
+build() {
+##make-package.sh
+#    if [ ! -f /miktex/build/Makefile ] || [ ! -z ${1+x} ]; then
+#        /miktex/configure.sh $1
+#    fi
+#    cd /miktex/build
+    make
+#    make test
+#    make package
+}
+check() {
+    make test
+}
+#!/bin/sh -e
+package() {
+    make DESTDIR="$pkgdir/" install
+
+#    cd $pkgdir
+#
+#    install -Dm644 opt/miktex/share/applications/miktex-console.desktop usr/share/applications/miktex-console.desktop
+#    sed -i 's/^Exec=miktex-console$/Exec=\/opt\/miktex\/bin\/miktex-console/' usr/share/applications/miktex-console.desktop
+#    cp -R opt/miktex/share/applications/icons usr/share/
+#
+#    mv opt/miktex/man usr/share/man
+}
