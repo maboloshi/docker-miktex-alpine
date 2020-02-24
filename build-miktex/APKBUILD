@@ -7,21 +7,21 @@ url="https://miktex.org"
 license="custom"
 depends="apr apr-util bzip2 cairo expat fontconfig freetype
          fribidi gd gmp graphite2 hunspell icu
-         libjpeg xz mpfr4 libmspack openssl pixman libpng
+         libjpeg xz libmspack openssl pixman libpng
          popt potrace uriparser"
 depends_dev=""
-#?makedepends=('git' 'cmake' 'coreutils' 'fop' 'sed' 'libxslt' 'qt5-tools')
-makedepends="apr-dev apr-util-dev bison ca-certificates cmake 
-             curl dpkg-dev file flex g++ gcc jpeg-dev 
+#?makedepends=( mpfr4 'git' 'cmake' 'coreutils' 'fop' 'sed' 'libxslt' 'qt5-tools')
+makedepends_build="apr-dev apr-util-dev bison ca-certificates cmake 
+             curl dpkg-dev file flex gcc jpeg-dev 
              bzip2-dev cairo-dev curl-dev fribidi-dev 
              gd-dev gmp-dev graphite2-dev hunspell-dev icu-dev 
              mpfr-dev libmspack-dev popt-dev potrace-dev openssl-dev 
              uriparser-dev zziplib-dev make libxslt xz-dev"
-#'su-exec' 
+#'su-exec'  g++
 source="https://miktex.org/download/ctan/systems/win32/miktex/source/${pkgname}-${pkgver}.tar.xz"
 
-builddir="$srcdir/$pkgname-$pkgver/build"
-sourcedir=""
+builddir="$pkgname-$pkgver/build"
+#sourcedir=""
 
 pkgver() {
     printf "%s" "$(curl -s "https://github.com/MiKTeX/miktex/releases/latest" | \
@@ -31,12 +31,12 @@ pkgver() {
 prepare() {
 #configure.sh
 #    package_revision=${1-1}
-    cd $builddir
+    mkdir -p "$builddir" && cd "$builddir"
     cmake \
-#        -DMIKTEX_PACKAGE_REVISION=${package_revision} \
-#        -DMIKTEX_LINUX_DIST=alpine \
-#        -DMIKTEX_LINUX_DIST_VERSION=undefined \
-#        -DMIKTEX_LINUX_DIST_CODE_NAME=undefined \
+        -DMIKTEX_PACKAGE_REVISION=${pkgver} \
+        -DMIKTEX_LINUX_DIST=alpine \
+        -DMIKTEX_LINUX_DIST_VERSION=undefined \
+        -DMIKTEX_LINUX_DIST_CODE_NAME=undefined \
         -DUSE_SYSTEM_HARFBUZZ=FALSE \
         -DUSE_SYSTEM_HARFBUZZ_ICU=FALSE \
         -DUSE_SYSTEM_LOG4CXX=FALSE \
@@ -44,7 +44,7 @@ prepare() {
         -DUSE_SYSTEM_POPPLER_QT5=FALSE \
         -DUSE_SYSTEM_ZZIP=FALSE \
         -DWITH_UI_QT=FALSE \
-        /miktex/source
+        "$srcdir"/$pkgname-$pkgver
 }
 build() {
 ##make-package.sh
