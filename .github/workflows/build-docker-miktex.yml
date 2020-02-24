@@ -9,8 +9,6 @@ jobs:
     - uses: actions/checkout@master
     - name: Build the MiKTeX apk package
       run: |
-#        pkgver=$(curl -s "https://github.com/MiKTeX/miktex/releases/latest" | \
-#        sed 's#.*tag/\(.*\)\".*#\1#')
         cd build-miktex
         mkdir -p apk
         docker run \
@@ -20,7 +18,6 @@ jobs:
             -v "$PWD/apk:/packages" \
             -v "$PWD/miktex-builder.rsa.pub:/etc/apk/keys/miktex-builder.rsa.pub" \
             andyshinn/alpine-abuild:latest
-#        mv apk/miktex* miktex.apk
         cd ../
     - name: Build and Publish to Docker Repository
       uses: elgohr/Publish-Docker-Github-Action@master
