@@ -71,3 +71,4 @@ package() {
 #
 #    mv opt/miktex/man usr/share/man
 }
+sha512sums="9eb94f71f68ea3586c534b38e833abf4e92c78baf73aa070db8d4acb98020207c27411305949ab55a60d8b1abe61dd1e3bcbf3f2a90e5dcc10cff31083cb4b64  miktex-2.9.7300.tar.xz"
