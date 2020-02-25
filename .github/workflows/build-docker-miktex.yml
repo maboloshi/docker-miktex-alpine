@@ -19,6 +19,11 @@ jobs:
             -v "$PWD/miktex-builder.rsa.pub:/etc/apk/keys/miktex-builder.rsa.pub" \
             andyshinn/alpine-abuild:latest
         cd ../
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: miktex.apk
+        path: build-miktex/apk/miktex-*.apk
     - name: Build and Publish to Docker Repository
       uses: elgohr/Publish-Docker-Github-Action@master
       with:
